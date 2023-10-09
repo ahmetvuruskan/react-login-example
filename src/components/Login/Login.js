@@ -1,9 +1,10 @@
-import React, {useState, useEffect, useReducer,useContext} from 'react';
+import React, {useState, useEffect, useReducer, useContext} from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
 import Button from '../UI/Button/Button';
 import AuthContext from "../../store/auth-context";
+import Input from "../UI/Input/Input";
 
 
 const emailReducer = (state, action) => {
@@ -31,7 +32,7 @@ const passWordReducer = (state, action) => {
     if (action.type === 'USER_INPUT') {
         return {
             value: action.val,
-            isValid: action.val.trim().length>6,
+            isValid: action.val.trim().length > 6,
         }
     }
     if (action.type === 'INPUT_BLUR') {
@@ -54,21 +55,21 @@ const Login = (props) => {
     const [emailState, dispatchEmail] = useReducer(emailReducer, {value: "", isValid: null})
     const [passWordState, dispatchPassword] = useReducer(passWordReducer, {value: "", isValid: null})
     const ctx = useContext(AuthContext)
-    const {isValid : emailIsValid} = emailState;
+    const {isValid: emailIsValid} = emailState;
     const {isValid: passIsValid} = passWordState;
     useEffect(() => {
-      const identifier = setTimeout(() => {
+        const identifier = setTimeout(() => {
             console.log("Check")
             setFormIsValid(
                 emailIsValid && passIsValid
             );
         }, 500)
 
-        return ()=>{
+        return () => {
             console.log("cleanup")
             clearTimeout(identifier);
         };
-    }, [emailIsValid,passIsValid]);
+    }, [emailIsValid, passIsValid]);
 
     const emailChangeHandler = (event) => {
         dispatchEmail({
@@ -104,42 +105,26 @@ const Login = (props) => {
 
     const submitHandler = (event) => {
         event.preventDefault();
-        ctx.onLogin(emailState.value, passWordState.value);
+        if (formIsValid) {
+            ctx.onLogin(emailState.value, passWordState.value);
+        }else if (!emailIsValid){
+
+        }else {
+
+        }
+
     };
 
     return (
         <Card className={classes.login}>
             <form onSubmit={submitHandler}>
-                <div
-                    className={`${classes.control} ${
-                        emailState.isValid === false ? classes.invalid : ''
-                    }`}
-                >
-                    <label htmlFor="email">E-Mail</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={emailState.value}
-                        onChange={emailChangeHandler}
-                        onBlur={validateEmailHandler}
-                    />
-                </div>
-                <div
-                    className={`${classes.control} ${
-                        passWordState.isValid === false ? classes.invalid : ''
-                    }`}
-                >
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={passWordState.value}
-                        onChange={passwordChangeHandler}
-                        onBlur={validatePasswordHandler}
-                    />
-                </div>
+                <Input isValid={emailIsValid} label="Email" type="email" id="email" value={emailState.value}
+                       onChange={emailChangeHandler}
+                       onBlur={validateEmailHandler}></Input>
+                <Input isValid={passIsValid} label="Password" type="password" id="password" value={passWordState.value}
+                       onChange={passwordChangeHandler} onBlur={validatePasswordHandler}></Input>
                 <div className={classes.actions}>
-                    <Button type="submit" className={classes.btn} disabled={!formIsValid}>
+                    <Button type="submit" className={classes.btn}>
                         Login
                     </Button>
                 </div>
